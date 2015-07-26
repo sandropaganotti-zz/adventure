@@ -1,0 +1,134 @@
+System.register(['../js/sprite.js', './sprites/guybrush.js'], function (_export) {
+  'use strict';
+
+  var Sprite, guybrush;
+  return {
+    setters: [function (_jsSpriteJs) {
+      Sprite = _jsSpriteJs['default'];
+    }, function (_spritesGuybrushJs) {
+      guybrush = _spritesGuybrushJs['default'];
+    }],
+    execute: function () {
+      _export('default', function () {
+
+        describe('Sprite', function () {
+
+          it('exist', function () {
+            expect(Sprite).to.exist;
+          });
+
+          describe('configuration options', function () {
+
+            it('works specifing frame boundaries', function () {
+              var guybrushWalkingRight = new Sprite({
+                sheet: {
+                  name: './assets/sprite-sheets/guybrush.png',
+                  frames: [{
+                    top: 100,
+                    left: 50,
+                    height: 50,
+                    width: 50,
+                    duration: 100
+                  }]
+                }
+              });
+
+              expect(guybrushWalkingRight.frames.length).to.be.equal(1);
+              expect(guybrushWalkingRight.frames[0].left).to.be.equal(50);
+            });
+          });
+
+          describe('Initialization and workflow', function () {
+            var guybrushWalkingRight = undefined,
+                context = undefined;
+
+            beforeEach(function () {
+              context = document.createElement('canvas').getContext('2d');
+              context.canvas.width = 100;
+              context.canvas.height = 100;
+
+              guybrushWalkingRight = guybrush().walkingRight;
+            });
+
+            it('loads a sprite', function (done) {
+              guybrushWalkingRight.build().then(function () {
+                expect(guybrushWalkingRight.frames.length).to.be.equal(6);
+              }).then(done);
+            });
+
+            it('builds a sprite', function (done) {
+              guybrushWalkingRight.build().then(function () {
+                expect(guybrushWalkingRight.sheet).to.exist;
+              }).then(done);
+            });
+
+            it('runs a sprite', function (done) {
+              var sprite = guybrushWalkingRight;
+              sprite.build().then(function () {
+                sprite.loop().then(done);
+
+                sprite.tick({ delta: 10 });
+                expect(sprite.frame.left).to.be.equal(sprite.frames[0].left);
+                sprite.tick({ delta: 95 });
+                expect(sprite.frame.left).to.be.equal(sprite.frames[1].left);
+                sprite.tick({ delta: 600 });
+                expect(sprite.animation).to.be['null'];
+              });
+            });
+
+            it('skips frames when necessary', function (done) {
+              var sprite = guybrushWalkingRight;
+              sprite.build().then(function () {
+                sprite.loop().then(done);
+
+                sprite.tick({ delta: 101 });
+                expect(sprite.frame.left).to.be.equal(sprite.frames[1].left);
+                sprite.tick({ delta: 1000 });
+                expect(sprite.animation).to.be['null'];
+              });
+            });
+
+            it('draw a sprite', function (done) {
+              var sprite = guybrushWalkingRight;
+              sprite.build().then(function (sprite) {
+                sprite.loop().then(done);
+
+                sprite.tick({ delta: 10, x: 50, y: 50, context: context });
+                var imageData = context.getImageData(50, 50, 1, 1);
+                expect(imageData.data[0]).to.be.equal(68);
+                expect(imageData.data[1]).to.be.equal(68);
+                expect(imageData.data[2]).to.be.equal(68);
+                expect(imageData.data[3]).to.be.equal(255);
+                sprite.tick({ delta: 95, x: 50, y: 50, context: context });
+                imageData = context.getImageData(50, 50, 1, 1);
+                expect(imageData.data[0]).to.be.equal(68);
+                expect(imageData.data[1]).to.be.equal(68);
+                expect(imageData.data[2]).to.be.equal(68);
+                expect(imageData.data[3]).to.be.equal(255);
+                sprite.tick({ delta: 1000 });
+              });
+            });
+
+            it('plays a sprite until stopped', function (done) {
+              var sprite = guybrushWalkingRight;
+              sprite.build().then(function () {
+                return sprite.run();
+              }).then(function () {
+                sprite.tick({ delta: 10 });
+                expect(sprite.frame.left).to.be.equal(sprite.frames[0].left);
+                sprite.tick({ delta: 600 });
+                expect(sprite.frame.left).to.be.equal(sprite.frames[0].left);
+
+                return sprite.stop();
+              }).then(function () {
+                sprite.tick({ delta: 1 });
+                expect(sprite.frame).to.be['null'];
+              }).then(done);
+            });
+          });
+        });
+      });
+    }
+  };
+});
+//# sourceMappingURL=sprite.js.map
