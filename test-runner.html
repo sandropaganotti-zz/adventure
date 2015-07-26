@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>Mocha Frontend Test Runner</title>
+    <link rel="stylesheet" type="text/css" href="node_modules/grunt-mocha/node_modules/mocha/mocha.css">
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <div id="messages"></div>
+    <div id="fixtures"></div>
+    <script src="node_modules/systemjs/dist/system.js"></script>
+    <script src="node_modules/grunt-mocha/node_modules/mocha/mocha.js"></script>
+    <script src="node_modules/chai/chai.js"></script>
+    <script src="node_modules/grunt-babel/node_modules/babel-core/browser-polyfill.js"></script>
+    <script>
+      /*globals mocha chai*/
+      mocha.setup('bdd');
+      var expect = chai.expect;
+      System.config({ 
+        transpiler: 'babel'
+      });      
+      System.import('./build/test/index.js');
+    </script>
+  </body>
+</html>
