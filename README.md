@@ -69,6 +69,18 @@ Now, let's see this first version of `demo.html`:
           }
         });
         
+        // this is the same as the previous, but flipped
+        var guybrushWalkingLeft = new Sprite({
+          sheet: {
+            name: sheetPath,
+            flipHorizontally: true,
+            sequence: {
+              key: 252,
+              duration: 100
+            }
+          }
+        });
+        
         // another sprite
         var guybrushWaiting = new Sprite({
           sheet: {
@@ -93,7 +105,10 @@ Sprites are collected into `Item` instances, an item can be, for example, Guybru
 ```javascript
 var guybrush = new Item({
   sprites: {
-    walkingRight: guybrushWalkingRight,
+    walking: {
+        other: guybrushWalkingRight,
+        left: guybrushWalkingLeft
+    },
     waiting: guybrushWaiting
   },
   context: context
@@ -107,7 +122,7 @@ Once you got items you need to build rules, like: _'when I click on the page I w
 guybrush.build().then(function(){
   guybrush.still({key:'waiting', x: 30, y: 30});
   canvas.addEventListener('click', function(evt){
-    guybrush.move({key:'walkingRight', speed: 0.07, toX: evt.offsetX, toY: evt.offsetY})
+    guybrush.move({key:'walking', speed: 0.07, toX: evt.offsetX, toY: evt.offsetY})
       .then(function(){
         return guybrush.still({key:'waiting'});
       });
@@ -121,7 +136,7 @@ Adventure does not embed any internal clock, it doesn't have any `setTimeout`, o
 var prev;
 function tick(){
   var timestamp = Date.now();
-  canvas.width = canvas.width;
+  context.clearRect(0,0,canvas.width,canvas.height);
   guybrush.tick({delta: timestamp - prev});
   prev = timestamp;
   window.requestAnimationFrame(tick);
@@ -148,3 +163,7 @@ LucasArts for Monkey Island<br>
 All assets in this repository are properties of LucasArts and copyrighted to LucasArts : Monkey Island® ©LucasArts ALL RIGHTS RESERVED.
 
 All code in this repository is released under the terms of the MIT license.
+
+## Changelog
+
+02 aug 15: added directions to movement.
