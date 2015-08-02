@@ -16,6 +16,16 @@ System.register(['../../js/sprite.js'], function (_export) {
           }
         }
       }),
+      walkingLeft: new Sprite({
+        sheet: {
+          name: sheetPath,
+          flipHorizontally: true,
+          sequence: {
+            key: 252,
+            duration: 100
+          }
+        }
+      }),
       waiting: new Sprite({
         sheet: {
           name: sheetPath,

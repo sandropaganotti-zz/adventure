@@ -17,7 +17,6 @@ System.register(['./util.js'], function (_export) {
           _classCallCheck(this, SpriteSheet);
 
           this.sheets = {};
-          this.context = document.createElement('canvas').getContext('2d');
         }
 
         _createClass(SpriteSheet, [{
@@ -45,17 +44,19 @@ System.register(['./util.js'], function (_export) {
             return new Promise(function (resolve) {
               var sheet = new Image();
               sheet.onload = function () {
-                _this2.context.canvas.width = sheet.width;
-                _this2.context.canvas.height = sheet.height;
-                _this2.context.drawImage(sheet, 0, 0);
-                var imageData = _this2.context.getImageData(0, 0, sheet.width, sheet.height);
+                var context = document.createElement('canvas').getContext('2d');
+                context.canvas.width = sheet.width;
+                context.canvas.height = sheet.height;
+                context.drawImage(sheet, 0, 0);
+                var imageData = context.getImageData(0, 0, sheet.width, sheet.height);
 
                 var _process = _this2.process(imageData);
 
                 var image = _process.image;
                 var sequences = _process.sequences;
 
-                resolve({ image: image, sequences: _this2.sequences(sequences) });
+                context.putImageData(image, 0, 0);
+                resolve({ image: context.canvas, sequences: _this2.sequences(sequences) });
               };
               sheet.src = path;
             });

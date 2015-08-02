@@ -29,7 +29,8 @@ System.register(['../js/sprite-sheet.js'], function (_export) {
 
           it('set opacity 0 to pixel with color alpha', function (done) {
             spriteSheet.get({ path: './assets/sprite-sheets/guybrush.png' }).then(function (guybrush) {
-              expect(guybrush.image.data[3]).to.be.equal(0);
+              var imageData = guybrush.image.getContext('2d').getImageData(0, 0, guybrush.image.width, guybrush.image.height);
+              expect(imageData.data[3]).to.be.equal(0);
             }).then(done);
           });
 
