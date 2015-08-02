@@ -3,7 +3,6 @@ import {isEqual} from './util.js';
 class SpriteSheet{
   constructor(){
     this.sheets = {};
-    this.context = document.createElement('canvas').getContext('2d');
   }
     
   get({path}){
@@ -22,12 +21,14 @@ class SpriteSheet{
     return new Promise(resolve => {
       let sheet = new Image();
       sheet.onload = () => {
-        this.context.canvas.width = sheet.width;
-        this.context.canvas.height = sheet.height;
-        this.context.drawImage(sheet,0,0);
-        let imageData = this.context.getImageData(0,0,sheet.width,sheet.height);
+        let context = document.createElement('canvas').getContext('2d');
+        context.canvas.width = sheet.width;
+        context.canvas.height = sheet.height;
+        context.drawImage(sheet,0,0);
+        let imageData = context.getImageData(0,0,sheet.width,sheet.height);
         let {image, sequences} = this.process(imageData);
-        resolve({image: image, sequences: this.sequences(sequences)});
+        context.putImageData(image,0,0);
+        resolve({image: context.canvas, sequences: this.sequences(sequences)});
       };
       sheet.src = path;
     });

@@ -1,20 +1,22 @@
 export default class Item{
-  constructor({sprites = {}, context = null}){
+  constructor({sprites = {}, context = null, direction = 'right'}){
     this.sprites = sprites;
     this.context = context;
+    this.direction = direction;
   }
   
   build(){
     return Promise.all(Object.keys(this.sprites).map(key => {
-      this.sprites[key].build();
+      let sprite = this.sprites[key];
+      sprite.build ? sprite.build() : Promise.all(Object.keys(sprite).map(direction => {
+        sprite[direction].build();
+      }));
     })).then(() => this);
   }
   
-  get iterator(){ return function *({resolve,x=null, y=null, toX=null, toY=null, speed=0}){
-    this.x = x || this.x;
-    this.y = y || this.y;
-    let line = toX && toY ? Math.pow(Math.pow(this.x - toX,2) + Math.pow(this.y - toY,2), 0.5) : 0;
-    let [dx, dy] = line ? [(toX - this.x) / line * speed, (toY - this.y) / line * speed] : [0,0]; 
+  get iterator(){ return function *({resolve,x=null, y=null, toX=null, toY=null, speed=0, dx=0, dy=0}){
+    this.x = x;
+    this.y = y;
     while(!speed || (this.x !== toX && this.y !== toY)){
       let delta = yield(null);
       this.x = this.x + dx * delta;
@@ -27,17 +29,23 @@ export default class Item{
     resolve();
   }}
   
-  still({key, x = null, y = null}){
+  still({key = this.key, x = this.x, y = this.y}){
+    this.key = key;
     this.animation = this.iterator({x:x, y:y});
     this.sprite = this.sprites[key];
     this.animation.next();
     return this.sprite.run();
   }
   
-  move({key, fromX = null, fromY = null, toX, toY, speed}){
+  move({key = this.key, fromX = this.x, fromY = this.y, toX, toY, speed = this.speed}){
     return new Promise( resolve => {
-      this.animation = this.iterator({resolve: resolve, x:fromX, y:fromY, toX: toX, toY: toY, speed: speed});
-      this.sprite = this.sprites[key];
+      let line = Math.pow(Math.pow(fromX - toX,2) + Math.pow(fromY - toY,2), 0.5);
+      let [dx, dy] = [(toX - fromX) / line * speed, (toY - fromY) / line * speed];
+      this.key = key;
+      this.speed = speed;
+      this.direction = Math.abs(dx) >= Math.abs(dy) ? dx > 0 ? 'right' : 'left' : dy > 0 ? 'bottom' : 'top';
+      this.animation = this.iterator({resolve: resolve, x:fromX, y:fromY, toX: toX, toY: toY, speed: speed, dx: dx, dy: dy});
+      this.sprite = this.sprites[key][this.direction] || this.sprites[key]['other'] || this.sprites[key];
       this.animation.next();
       this.sprite.run();
     });

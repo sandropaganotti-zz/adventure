@@ -13,6 +13,16 @@ export default function guybrush(){
         }
       }
     }),
+    walkingLeft: new Sprite({
+      sheet: {
+        name: sheetPath,
+        flipHorizontally: true,
+        sequence: {
+          key: 252,
+          duration: 100
+        }
+      }
+    }),
     waiting: new Sprite({
       sheet: {
         name: sheetPath,

@@ -21,16 +21,25 @@
         var context = canvas.getContext('2d');
         canvas.width = 640;
         canvas.height = 480;
+        context.imageSmoothingEnabled = false;
+
       
+        var sprites = guybrushSprites.default();
         var guybrush = new Item.default({
-          sprites: guybrushSprites.default(),
+          sprites: {
+            walking: {
+              left: sprites.walkingLeft,
+              other: sprites.walkingRight
+            },
+            waiting: sprites.waiting
+          },
           context: context
         });
         
         guybrush.build().then(function(){
           guybrush.still({key:'waiting', x: 30, y: 30});
           canvas.addEventListener('click', function(evt){
-            guybrush.move({key:'walkingRight', speed: 0.07, toX: evt.offsetX, toY: evt.offsetY})
+            guybrush.move({key:'walking', speed: 0.07, toX: evt.offsetX, toY: evt.offsetY})
               .then(function(){
                 return guybrush.still({key:'waiting'});
               });
@@ -41,7 +50,7 @@
         
         function tick(){
           var timestamp = Date.now();
-          canvas.width = canvas.width;
+          context.clearRect(0,0,canvas.width,canvas.height);
           guybrush.tick({delta: timestamp - prev});
           prev = timestamp;
           window.requestAnimationFrame(tick);

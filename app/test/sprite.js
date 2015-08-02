@@ -91,17 +91,18 @@ export default function(){
           .then(sprite => {
             sprite.loop().then(done);
             
-            sprite.tick({delta: 10, x:50, y:50, context: context});
-            let imageData = context.getImageData(50,50,1,1);
-            expect(imageData.data[0]).to.be.equal(68);
-            expect(imageData.data[1]).to.be.equal(68);
-            expect(imageData.data[2]).to.be.equal(68);
+            sprite.tick({delta: 1, x:0, y:0, context:context});
+            sprite.tick({delta: 10, x:sprite.frame.width/2 , y:sprite.frame.height/2, context: context});
+            let imageData = context.getImageData(12,6,1,1);
+            expect(imageData.data[0]).to.be.equal(0);
+            expect(imageData.data[1]).to.be.equal(0);
+            expect(imageData.data[2]).to.be.equal(0);
             expect(imageData.data[3]).to.be.equal(255);
-            sprite.tick({delta: 95, x:50, y:50, context: context});
-            imageData = context.getImageData(50,50,1,1);
-            expect(imageData.data[0]).to.be.equal(68);
-            expect(imageData.data[1]).to.be.equal(68);
-            expect(imageData.data[2]).to.be.equal(68);
+            sprite.tick({delta: 95, x:sprite.frame.width/2 , y:sprite.frame.height/2, context: context});
+            imageData = context.getImageData(12,6,1,1);
+            expect(imageData.data[0]).to.be.equal(0);
+            expect(imageData.data[1]).to.be.equal(0);
+            expect(imageData.data[2]).to.be.equal(0);
             expect(imageData.data[3]).to.be.equal(255);
             sprite.tick({delta: 1000});
           });
@@ -125,6 +126,40 @@ export default function(){
             expect(sprite.frame).to.be.null;
           })
           .then(done);
+      });
+      
+      it('can play a sprite flipped', done => {
+        let sprite = new Sprite({ // guybrushWalkingRight
+          sheet: {
+            name: './assets/sprite-sheets/guybrush.png',
+            flipHorizontally: true,
+            sequence: {
+              key: 252,
+              duration: 100
+            }
+          }
+        });
+        sprite
+          .build()
+          .then(() => {
+            sprite.loop().then(done);
+            
+            sprite.tick({delta: 10, x:0 , y:0, context: context});
+            sprite.tick({delta: 10, x:sprite.frame.width/2 , y:sprite.frame.height/2, context: context});
+            let imageData = context.getImageData(4,6,1,1);
+            if(navigator.userAgent.indexOf('PhantomJS') === -1){
+              expect(imageData.data[0]).to.be.equal(0);
+              expect(imageData.data[1]).to.be.equal(0);
+              expect(imageData.data[2]).to.be.equal(0);
+              expect(imageData.data[3]).to.be.equal(255);
+            } else { // PhantomJS seems to perform some image smoothing
+              expect(imageData.data[0]).to.be.equal(22);
+              expect(imageData.data[1]).to.be.equal(12);
+              expect(imageData.data[2]).to.be.equal(11);
+              expect(imageData.data[3]).to.be.equal(255);            
+            }
+            sprite.tick({delta: 1000});
+          });
       });
       
     });
