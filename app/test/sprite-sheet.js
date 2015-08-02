@@ -25,7 +25,8 @@ export default function(){
     it('set opacity 0 to pixel with color alpha', done => {
       spriteSheet.get({path: './assets/sprite-sheets/guybrush.png'})
         .then(guybrush => {
-          expect(guybrush.image.data[3]).to.be.equal(0);
+          let imageData = guybrush.image.getContext('2d').getImageData(0,0,guybrush.image.width,guybrush.image.height);
+          expect(imageData.data[3]).to.be.equal(0);
         })
         .then(done);
     });

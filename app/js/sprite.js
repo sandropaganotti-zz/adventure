@@ -64,10 +64,17 @@ export default class Sprite{
   
   draw(x,y,context){
     if(this.frame && context){
-      context.putImageData(
-        this.image, (x - this.frame.width/2) - this.frame.left, (y - this.frame.height/2) - this.frame.top, 
-        this.frame.left, this.frame.top, this.frame.width, this.frame.height
+      context.save();
+      if(this.sheet.flipHorizontally){
+        context.translate(context.canvas.width, 0);
+        context.scale(-1, 1);
+        x = context.canvas.width - x;
+      }
+      context.drawImage(
+        this.image, this.frame.left, this.frame.top,  this.frame.width, this.frame.height,
+        (x - this.frame.width/2), (y - this.frame.height/2), this.frame.width, this.frame.height
       );
+      context.restore();
     }
   }
 }

@@ -14,7 +14,7 @@ export default function(){
         sprites: guybrushSprites()
       });
       
-      expect(Object.keys(guybrush.sprites).length).to.be.equal(2);
+      expect(Object.keys(guybrush.sprites).length).to.be.equal(3);
     });
 
     it('position a sprite', done => {
@@ -47,6 +47,31 @@ export default function(){
         item.tick({delta: 1000});  
       });
     });
+    
+    it('allow to group sprites by direction', done => {
+      let sprites = guybrushSprites();
+      let guybrush = new Item({
+        sprites: {
+          walking: {
+            left: sprites.walkingLeft,
+            other: sprites.walkingRight
+          }
+        }
+      });
+      guybrush.build().then(item => {
+        item.move({key: 'walking', speed: 2,fromX: 50, fromY: 50, toX: 100, toY: 100})
+          .then(() => { 
+            let newmove = item.move({toX: 50, toY: 100}); 
+            expect(item.direction).to.be.equal('left');
+            newmove;
+          })
+          .then(done);
+
+        expect(item.direction).to.be.equal('right');
+        item.tick({delta: 10000});
+      });
+    });
+    
   });
   
 }
