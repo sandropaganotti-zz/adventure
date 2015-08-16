@@ -16,14 +16,14 @@ System.register([], function (_export) {
           var sprites = _ref$sprites === undefined ? {} : _ref$sprites;
           var _ref$context = _ref.context;
           var context = _ref$context === undefined ? null : _ref$context;
-          var _ref$direction = _ref.direction;
-          var direction = _ref$direction === undefined ? 'right' : _ref$direction;
+          var _ref$directions = _ref.directions;
+          var directions = _ref$directions === undefined ? ['right', 'top'] : _ref$directions;
 
           _classCallCheck(this, Item);
 
           this.sprites = sprites;
           this.context = context;
-          this.direction = direction;
+          this.directions = directions;
         }
 
         _createClass(Item, [{
@@ -79,9 +79,12 @@ System.register([], function (_export) {
 
               _this2.key = key;
               _this2.speed = speed;
-              _this2.direction = Math.abs(dx) >= Math.abs(dy) ? dx > 0 ? 'right' : 'left' : dy > 0 ? 'bottom' : 'top';
+              _this2.directions = [dx > 0 ? 'right' : 'left', dy > 0 ? 'bottom' : 'top'];
+              _this2.directions = Math.abs(dx) > Math.abs(dy) ? _this2.directions : _this2.directions.reverse();
               _this2.animation = _this2.iterator({ resolve: resolve, x: fromX, y: fromY, toX: toX, toY: toY, speed: speed, dx: dx, dy: dy });
-              _this2.sprite = _this2.sprites[key][_this2.direction] || _this2.sprites[key]['other'] || _this2.sprites[key];
+              _this2.sprite = _this2.directions.reduce(function (memo, dir) {
+                return !memo ? _this2.sprites[key][dir] : memo;
+              }, null) || _this2.sprites[key]['other'] || _this2.sprites[key];
               _this2.animation.next();
               _this2.sprite.run();
             });
