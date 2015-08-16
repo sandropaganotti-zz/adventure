@@ -1,8 +1,8 @@
 export default class Item{
-  constructor({sprites = {}, context = null, direction = 'right'}){
+  constructor({sprites = {}, context = null, directions = ['right','top']}){
     this.sprites = sprites;
     this.context = context;
-    this.direction = direction;
+    this.directions = directions;
   }
   
   build(){
@@ -43,9 +43,10 @@ export default class Item{
       let [dx, dy] = [(toX - fromX) / line * speed, (toY - fromY) / line * speed];
       this.key = key;
       this.speed = speed;
-      this.direction = Math.abs(dx) >= Math.abs(dy) ? dx > 0 ? 'right' : 'left' : dy > 0 ? 'bottom' : 'top';
+      this.directions = [dx > 0 ? 'right' : 'left', dy > 0 ? 'bottom' : 'top'];
+      this.directions = Math.abs(dx) > Math.abs(dy) ? this.directions : this.directions.reverse();
       this.animation = this.iterator({resolve: resolve, x:fromX, y:fromY, toX: toX, toY: toY, speed: speed, dx: dx, dy: dy});
-      this.sprite = this.sprites[key][this.direction] || this.sprites[key]['other'] || this.sprites[key];
+      this.sprite = this.directions.reduce((memo,dir) => !memo ? this.sprites[key][dir] : memo, null) || this.sprites[key]['other'] || this.sprites[key];
       this.animation.next();
       this.sprite.run();
     });

@@ -59,15 +59,15 @@ export default function(){
         }
       });
       guybrush.build().then(item => {
-        item.move({key: 'walking', speed: 2,fromX: 50, fromY: 50, toX: 100, toY: 100})
+        item.move({key: 'walking', speed: 2, fromX: 50, fromY: 50, toX: 110, toY: 100})
           .then(() => { 
             let newmove = item.move({toX: 50, toY: 100}); 
-            expect(item.direction).to.be.equal('left');
+            expect(item.directions[0]).to.be.equal('left');
             newmove;
           })
           .then(done);
 
-        expect(item.direction).to.be.equal('right');
+        expect(item.directions[0]).to.be.equal('right');
         item.tick({delta: 10000});
       });
     });
